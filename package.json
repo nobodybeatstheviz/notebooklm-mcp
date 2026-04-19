@@ -1,0 +1,27 @@
+{
+  "name": "notebooklm-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Google NotebookLM (stdio + Streamable HTTP)",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "notebooklm-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:http": "node dist/index.js --http",
+    "auth": "node dist/index.js --auth",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.9.0",
+    "express": "^4.18.2",
+    "puppeteer": "^22.6.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}

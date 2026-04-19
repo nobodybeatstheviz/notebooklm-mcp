@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "TypeScript Watch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": null
+    },
+    {
+      "name": "MCP HTTP Server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:http"],
+      "port": 3000
+    },
+    {
+      "name": "MCP stdio Server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "port": null
+    }
+  ]
+}

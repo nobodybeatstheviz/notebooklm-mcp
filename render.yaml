@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: notebooklm-mcp
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NOTEBOOKLM_COOKIES
+        sync: false   # set manually in Render dashboard
+      - key: MCP_AUTH_SECRET
+        generateValue: true
+    healthCheckPath: /health

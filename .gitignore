@@ -1,0 +1,4 @@
+node_modules/
+dist/
+.notebooklm-cookies.json
+*.js.map
