@@ -121,9 +121,9 @@ export async function startHttpServer(port = DEFAULT_PORT): Promise<void> {
   });
 
   await new Promise<void>((resolve) => {
-    app.listen(port, () => {
-      console.error(`[http] NotebookLM MCP server listening on http://localhost:${port}/mcp`);
-      console.error(`[http] Cookie refresh endpoint: POST http://localhost:${port}/auth/cookies`);
+    app.listen(port, "0.0.0.0", () => {
+      console.error(`[http] NotebookLM MCP server listening on http://0.0.0.0:${port}/mcp`);
+      console.error(`[http] Cookie refresh endpoint: POST http://0.0.0.0:${port}/auth/cookies`);
       resolve();
     });
   });
