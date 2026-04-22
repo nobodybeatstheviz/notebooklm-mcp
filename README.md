@@ -33,6 +33,33 @@ saved to `~/.notebooklm-cookies.json`, and reused for all API calls.
 
 ---
 
+## Quick Start
+
+**Local (Claude Desktop / Claude Code)** — 4 commands:
+
+```bash
+git clone https://github.com/nobodybeatstheviz/notebooklm-mcp.git
+cd notebooklm-mcp
+npm install && npm run build
+node dist/index.js --auth    # opens Chrome → log in → press Enter
+```
+
+Then wire it to your client — see [Usage by client](#usage-by-client).
+
+**Remote (Claude.ai / Cowork)** — 5 steps:
+
+1. Complete the local Quick Start above so `~/.notebooklm-cookies.json` exists
+2. Push this repo to GitHub → [railway.app](https://railway.app) → New Project → Deploy from GitHub (auto-detects the Dockerfile)
+3. In Railway dashboard → **Variables**, add:
+   - `NOTEBOOKLM_COOKIES` — paste the **entire** JSON from `~/.notebooklm-cookies.json`
+   - `MCP_AUTH_SECRET` — any strong random string
+4. Wait for deploy to finish, then hit `https://YOUR-URL.up.railway.app/health` in a browser — should return `{"status":"ok","sessions":0}`
+5. Claude.ai → Settings → Integrations → Add MCP Server → paste `https://YOUR-URL.up.railway.app/mcp`
+
+Full walkthrough in [Deployment](#deployment-railway).
+
+---
+
 ## Prerequisites
 
 - **Node.js 20+**
@@ -205,6 +232,8 @@ Chat uses a separate streaming endpoint:
 
 ## Troubleshooting
 
+### Local (stdio)
+
 **"Not authenticated — run with --auth first"**
 Run `node dist/index.js --auth` and complete the Google login flow.
 
@@ -215,10 +244,52 @@ set `CHROME_PATH` env var before running `--auth`.
 
 **Tools not showing up in Claude Desktop**
 Start a new chat (tool list is cached per session). Also ensure you restarted
-Claude Desktop after any config change.
+Claude Desktop after any config change. A full quit-and-relaunch (not just close
+window) is sometimes required on Windows — check Task Manager for stray
+`Claude.exe` processes.
 
 **400 Bad Request from API**
 Session cookies may be expired. Re-run `node dist/index.js --auth`.
+
+### Railway / remote HTTP
+
+**404 at `/mcp` from the Railway URL**
+The HTTP server must bind to `0.0.0.0` (not `localhost`) so Railway's router
+can reach it. Check the deploy logs for:
+```
+[http] NotebookLM MCP server listening on http://0.0.0.0:3000/mcp
+```
+If the log still says `localhost`, pull latest `main` (the fix is in
+`src/http.ts` — `app.listen(port, "0.0.0.0", ...)`).
+
+**Health check: is the server actually running?**
+Hit `https://YOUR-URL.up.railway.app/health` in a browser. Expected response:
+```json
+{"status":"ok","sessions":0}
+```
+If this fails, the container isn't serving traffic — open Railway's **Deployments**
+tab and read the runtime logs for the crash.
+
+**Claude.ai says "Not authenticated" even though `NOTEBOOKLM_COOKIES` is set**
+Most common cause: the env var value was truncated when pasting. The JSON must
+start with `{"cookies":[` and end with `}`. Re-run `cat ~/.notebooklm-cookies.json`
+locally, copy the entire output, and paste it as the full `NOTEBOOKLM_COOKIES`
+value — Railway redeploys automatically on save.
+
+**Tools connect but `list_notebooks` returns empty**
+Your cookies likely expired (Google sessions last ~2–4 weeks). Refresh them
+without a redeploy:
+```bash
+node dist/index.js --auth
+curl -X POST https://YOUR-URL.up.railway.app/auth/cookies ^
+  -H "Authorization: Bearer YOUR_MCP_AUTH_SECRET" ^
+  -H "Content-Type: application/json" ^
+  -d "@%USERPROFILE%\.notebooklm-cookies.json"
+```
+
+**"Unauthorized" on `POST /auth/cookies`**
+The `Authorization: Bearer ...` header must match the `MCP_AUTH_SECRET` env var
+in Railway exactly. No quotes, no trailing whitespace.
 
 ---
 
