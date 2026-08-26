@@ -5,3 +5,5 @@ dist/
 
 # Personal/account-specific notes -- never published
 NOTES-local.md
+claude_desktop_config.backup.json
+restore-claude-config.bat
