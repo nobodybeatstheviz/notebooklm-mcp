@@ -124,10 +124,22 @@ notebooklm_generate_audio    — notebook_id: string
 4. Run `npm run build`
 
 ### Re-authenticate
+
+**Use `auth-poll.mjs` — not `--auth`.**
+
 ```bash
-node dist/index.js --auth
+node auth-poll.mjs
 ```
-Opens real Chrome, user logs in, press Enter — saves `~/.notebooklm-cookies.json`.
+
+Opens real Chrome, you log in, and the script **detects the authenticated session on its own** (`WIZ_global_data` XSRF token + SID cookie), saves cookies + token, and exits. **No Enter keypress.**
+
+⚠️ **Why not `node dist/index.js --auth`:** it blocks on stdin waiting for Enter, which means it **hangs forever when launched from an agent's background shell**. `auth-poll.mjs` was written 2026-07-15 specifically to remove that blocking read.
+
+**Cookie lifetime:** normally ~2–4 weeks. Clearing browser cookies does **not** invalidate the saved cookie file — but a stale or wrong-profile session can look authenticated while listing **zero** notebooks.
+
+🔑 **An empty notebook list is a re-auth signal, not an empty account.**
+
+*(`auth-poll.mjs` is not yet committed upstream to the published package — candidate to promote.)*
 
 ### Build & run locally
 ```bash
