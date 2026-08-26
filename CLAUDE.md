@@ -139,7 +139,7 @@ Opens real Chrome, you log in, and the script **detects the authenticated sessio
 
 🔑 **An empty notebook list is a re-auth signal, not an empty account.**
 
-*(`auth-poll.mjs` is not yet committed upstream to the published package — candidate to promote.)*
+
 
 ### Build & run locally
 ```bash
